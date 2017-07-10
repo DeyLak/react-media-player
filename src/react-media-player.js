@@ -1,5 +1,8 @@
+export MediaContainer from './MediaContainer'
 export Media from './Media'
+export LeadingMedia from './LeadingMedia'
 export Player from './Player'
 export withMediaProps from './decorators/with-media-props'
+export vendorTypes from './vendors'
 export * as controls from './controls'
 export * as utils from './utils'

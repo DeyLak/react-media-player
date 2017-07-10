@@ -169,7 +169,9 @@ class HTML5 extends Component {
 
     if (!useAudioObject) {
       return createElement(vendor, {
-        ref: c => this._player = c,
+        ref: c => {
+          this._player = c
+        },
         src,
         ...extraProps,
         ...this._playerEvents

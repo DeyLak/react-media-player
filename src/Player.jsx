@@ -1,10 +1,11 @@
 import React, { Component, PropTypes, createElement } from 'react'
 import contextTypes from './context-types'
 import getVendor from './utils/get-vendor'
+import vendorTypes from './vendors'
 
 class Player extends Component {
   static propTypes = {
-    vendor: PropTypes.oneOf(['video', 'audio', 'youtube', 'vimeo']),
+    vendor: PropTypes.oneOf(vendorTypes),
     defaultCurrentTime: PropTypes.number,
     defaultVolume: PropTypes.number,
     defaultMuted: PropTypes.bool
