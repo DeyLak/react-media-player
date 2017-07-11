@@ -19,12 +19,14 @@ class LeadingMedia extends Component {
     super(props, context)
 
     this.leadingMedia = null
+    this.playerUnmount = true
 
     this.context.onLeadingMediaChange((vendor, media, player, playerComp, playerState) => {
       if (vendor !== this.props.vendor) return
       let shouldUpdate = false
       if (media && this.leadingMedia !== media) {
         this.leadingMedia = media
+        this.playerUnmount = true
         shouldUpdate = true
       }
       if (player) {
@@ -65,6 +67,9 @@ class LeadingMedia extends Component {
         },
         setPlayerProps: this.leadingMedia._setPlayerProps,
         setPlayerState: this._setPlayerState,
+        setPlayerUnmount: (value) => {
+          this.playerUnmount = value
+        }
       },
       _mediaGetters: {
         getPlayerEvents: () => {
@@ -73,8 +78,10 @@ class LeadingMedia extends Component {
         getPlayerNode: () => {
           return this.currentPlayer
         },
-        getWasPaused: () => {
-          return this.wasPaused
+        getWasPlaying: () => {
+          const result = !this.wasPaused && this.playerUnmount
+          this.playerUnmount = false
+          return result
         },
       },
       _isLeading: true,

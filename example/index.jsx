@@ -78,13 +78,15 @@ class App extends Component {
       <MediaContainer>
         <div>
           <LeadingMedia>
-            {({}) => (
-              <div>
-                <Player />
-                <PlayPause />
-                <SeekBar />
-              </div>
-            )}
+            {({ }) => {
+              return (
+                <div>
+                  <Player />
+                  <PlayPause />
+                  <SeekBar />
+                </div>
+              )
+            }}
           </LeadingMedia>
           <button
             onClick={() => this.setState({ showMediaPlayer: !showMediaPlayer })}

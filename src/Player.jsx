@@ -24,6 +24,10 @@ class Player extends Component {
   componentWillMount() {
     this._setPlayerProps(this.props)
 
+    if (this.context._mediaSetters.setPlayerUnmount) {
+      this.context._mediaSetters.setPlayerUnmount(true)
+    }
+
     // we need to unset the loading state if no source was loaded
     if (!this.props.src) {
       this._setLoading(false)
@@ -146,7 +150,7 @@ class Player extends Component {
                 playerNode[key.toLowerCase()] = playerEvents[key]
               })
             }
-            if (!this.context._mediaGetters.getWasPaused()) {
+            if (this.context._mediaGetters.getWasPlaying()) {
               playerNode.play()
             }
           },
