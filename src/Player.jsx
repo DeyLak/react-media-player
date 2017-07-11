@@ -55,7 +55,14 @@ class Player extends Component {
   }
 
   _setPlayerProps(props) {
-    this.context._mediaSetters.setPlayerProps(props)
+    let propsToSet = props
+    if (this.context._isLeading) {
+      propsToSet = Object.keys(props).reduce((memo, key) => ({
+        ...memo,
+        [`_${key}Leading`]: props[key],
+      }), {})
+    }
+    this.context._mediaSetters.setPlayerProps(propsToSet)
   }
 
   _setDefaults() {
@@ -117,6 +124,35 @@ class Player extends Component {
     const { src, vendor: _vendor, autoPlay, onReady, onEnded, defaultCurrentTime, defaultVolume, defaultMuted, ...extraProps } = this.props
     const { vendor, component } = getVendor(src, _vendor)
 
+    if (this.context._isLeading) {
+      return (
+        <div {...{
+          ref: (node) => {
+            if (!node) return
+            const playerNode = this.context._mediaGetters.getPlayerNode()
+            if (!playerNode) return
+
+            if (node.children.length) {
+              if (node.children[0] !== playerNode) {
+                node.replaceChild(playerNode, node.children[0])
+              }
+            } else {
+              node.appendChild(playerNode)
+            }
+            this.context._mediaSetters.setPlayerNode(playerNode)
+            const playerEvents = this.context._mediaGetters.getPlayerEvents()
+            if (playerEvents) {
+              Object.keys(playerEvents).forEach(key => {
+                playerNode[key.toLowerCase()] = playerEvents[key]
+              })
+            }
+            if (!this.context._mediaGetters.getWasPaused()) {
+              playerNode.play()
+            }
+          },
+        }} />
+      )
+    }
     return (
       createElement(component, {
         ref: this._setPlayer,

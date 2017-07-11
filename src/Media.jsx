@@ -50,7 +50,8 @@ class Media extends Component {
       },
       _mediaGetters: {
         getPlayerEvents: this._getPlayerEvents()
-      }
+      },
+      _isLeading: false,
     }
   }
 
@@ -105,6 +106,7 @@ class Media extends Component {
     MEDIA_EVENTS_KEYS.forEach(key => {
       const stateKey = MEDIA_EVENTS[key]
       const propCallback = this._playerProps[key]
+      const leadingPropCallback = this._playerProps[`_${key}Leading`]
 
       events[key] = (val) => {
         if (stateKey) {
@@ -121,6 +123,9 @@ class Media extends Component {
           if (typeof propCallback === 'function') {
             propCallback(newState)
           }
+          if (typeof leadingPropCallback === 'function') {
+            leadingPropCallback(newState)
+          }
         }
       }
     })
@@ -132,7 +137,10 @@ class Media extends Component {
   }
 
   _setPlayerProps = (props) => {
-    this._playerProps = props
+    this._playerProps = {
+      ...this._playerProps,
+      ...props,
+    }
   }
 
   _setPlayerState = (state) => {

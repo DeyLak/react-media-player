@@ -54,35 +54,30 @@ class LeadingMedia extends Component {
 
   getChildContext() {
     if (!this.leadingMedia) return null
-    if (this.playerComp) {
-      if (this.leadingMedia._player !== this.playerComp) {
-        this.leadingMedia._setPlayer(this.playerComp)
-      }
-      if (this.currentPlayer && this.playerComp._player !== this.currentPlayer) {
-        this.playerComp._player = this.currentPlayer
-      }
-      if (this.playerComp.props && this.playerComp.props !== this.leadingMedia._player.props) {
-        this.leadingMedia._setPlayerProps(this.playerComp.props)
-      }
-      if (this.playerState && this.prevState !== this.playerState) {
-        setTimeout(() => {
-          this.prevState = this.playerState
-          this._setPlayerState(this.playerState)
-        }, 0)
-      }
-    }
     return {
       media: this._getPublicMediaProps(),
       _mediaSetters: {
         setPlayer: this.leadingMedia._setPlayer,
+        setPlayerNode: (player) => {
+          if (this.leadingMedia && this.leadingMedia._player) {
+            this.leadingMedia._player._player = player
+          }
+        },
         setPlayerProps: this.leadingMedia._setPlayerProps,
         setPlayerState: this._setPlayerState,
       },
       _mediaGetters: {
         getPlayerEvents: () => {
           return this.playerEvents || this.leadingMedia._getPlayerEvents()
-        }
+        },
+        getPlayerNode: () => {
+          return this.currentPlayer
+        },
+        getWasPaused: () => {
+          return this.wasPaused
+        },
       },
+      _isLeading: true,
     }
   }
 
@@ -107,41 +102,30 @@ class LeadingMedia extends Component {
       children,
       className,
     } = this.props
+
+    if (this.leadingMedia && this.playerComp) {
+      if (this.leadingMedia._player !== this.playerComp) {
+        this.leadingMedia._setPlayer(this.playerComp)
+      }
+      if (this.currentPlayer && this.playerComp._player !== this.currentPlayer) {
+        this.playerComp._player = this.currentPlayer
+      }
+      if (this.playerComp.props && this.playerComp.props !== this.leadingMedia._player.props) {
+        this.leadingMedia._setPlayerProps(this.playerComp.props)
+      }
+      if (this.playerState && this.prevState !== this.playerState) {
+        setTimeout(() => {
+          this.prevState = this.playerState
+          this._setPlayerState(this.playerState)
+        }, 0)
+      }
+    }
+
     if (!this.leadingMedia) return null
-    return (
-      <div className={className}>
-        <div {...{
-          ref: (node) => {
-            if (this.leadingMedia && node && this.currentPlayer) {
-              if (node.children.length) {
-                if (node.children[0] !== this.currentPlayer) {
-                  node.replaceChild(this.currentPlayer, node.children[0])
-                }
-              } else {
-                node.appendChild(this.currentPlayer)
-              }
-              if (!this.wasPaused) {
-                this.currentPlayer.play()
-              }
-              if (this.leadingMedia._player) {
-                this.leadingMedia._player._player = this.currentPlayer
-              }
-              if (this.playerEvents) {
-                Object.keys(this.playerEvents).forEach(key => {
-                  this.currentPlayer[key.toLowerCase()] = this.playerEvents[key]
-                })
-              }
-            }
-          },
-        }} />
-        {typeof children === 'function' &&
-          children(this.leadingMedia._getPublicMediaProps())
-        }
-        {typeof children !== 'function' &&
-          children
-        }
-      </div>
-    )
+    if (typeof children === 'function') {
+      return children(this._getPublicMediaProps())
+    }
+    return Children.only(children)
   }
 }
 
